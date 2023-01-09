@@ -1,0 +1,81 @@
+[tool.poetry]
+name = "peewee-model-utils"
+version = "0.1.0"
+description = ""
+authors = ["Rahul Mondal <rahul.mondal@ingrammicro.com>"]
+readme = "README.md"
+packages = [{include = "connect"}]
+
+[tool.poetry.dependencies]
+python = ">=3.7,<4"
+peewee = "3.15.4"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^6.1.2"
+pytest-cov = "^2.10.1"
+pytest-mock = "^3.3.1"
+coverage = {extras = ["toml"], version = "^5.3"}
+flake8 = "^5.0"
+flake8-bugbear = "^22"
+flake8-cognitive-complexity = "^0.1"
+flake8-commas = "^2.1"
+flake8-isort = "5.*"
+flake8-broken-line = "~0.5"
+flake8-comprehensions = "^3.10"
+flake8-debugger = "^4.0.0"
+flake8-eradicate = "^1.3.0"
+flake8-string-format = "^0.3.0"
+flake8-pyproject = "^1.2.2"
+isort = "5.*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+addopts = "--cov=connect.utils.peewee --cov-report=term-missing:skip-covered --cov-report=html --cov-report=xml"
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+omit = []
+
+exclude_lines = [
+    "pragma: no cover",
+    "def __str__",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
+[tool.flake8]
+exclude = [
+    ".idea",
+    ".vscode",
+    ".git",
+    "resources",
+    "*.eggs",
+    "tests/fixtures",
+    "connect/.data",
+    "venv"
+]
+
+show_source = true
+max_line_length = 100
+max_cognitive_complexity = 15
+ignore = ["FI1", "W503", "B008"]
+
+
+[tool.isort]
+src_paths = "*"
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+group_by_package = true
+multi_line_output = 3
+force_grid_wrap = 4
+combine_as_imports = true
+use_parentheses = true
+include_trailing_comma = true
+line_length = 100
+lines_after_imports = 2
