@@ -35,6 +35,9 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 testpaths = "tests"
 addopts = "--cov=connect.utils.peewee --cov-report=term-missing:skip-covered --cov-report=html --cov-report=xml"
+markers = [
+    "provide_objects: marks tests providing model objects as fixtures dynamically",
+]
 
 [tool.coverage.run]
 branch = true
