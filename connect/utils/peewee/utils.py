@@ -35,10 +35,10 @@ def generate_verbose_id(
     """
     Generate verbose id
 
-    :param prefix str: verbose id prefix
-    :param suffix_length int: verbose id suffix length
-    :param separator_frequency int: number of separators during generating id
-    :param separator str: verbose id separator
+    :param prefix: str: verbose id prefix
+    :param suffix_length: int: verbose id suffix length
+    :param separator_frequency: int: number of separators during generating id
+    :param separator: str: verbose id separator
 
     :return: verbose id
     :rtype: str
@@ -56,7 +56,7 @@ def random_numeric_string_sequence(length):
     """
     Generate random numeric string with passed length
 
-    :param length int: output string length
+    :param length: int: output string length
     :return: random numeric string
     :rtype: str
     """
@@ -67,3 +67,16 @@ def random_numeric_string_sequence(length):
         1 * 10**(length - 1),
         1 * 10**length - 1),
     )
+
+
+def is_verbose_id(prefix, separator, id_value):
+    """
+    Check if passed value is verbose id value with particular prefix
+
+    :param prefix: str: verbose id prefix
+    :param separator: str: verbose id separator
+    :param id_value: str: checked value
+    :return: if passed id_value is valid verbose id
+    :rtype: bool
+    """
+    return id_value.startswith(f'{prefix}{separator}')

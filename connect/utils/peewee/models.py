@@ -1,4 +1,14 @@
+import functools
+
 import peewee
+from peewee import DoesNotExist
+
+from connect.utils.peewee.exceptions import (
+    InvalidVerboseIdException,
+    MissedChainFieldException,
+    NullFieldValueException,
+)
+from connect.utils.peewee.utils import is_verbose_id
 
 
 class VerboseBase(peewee.Model):
@@ -52,3 +62,42 @@ class VerboseBase(peewee.Model):
                     raise Exception(
                         f'Cannot generate ID after {self.MAX_PK_ITERATIONS} iterations.')
         return super().save(*args, **kwargs)
+
+
+class TransactionalIDBase(VerboseBase):
+    SUFFIX_LENGTH = 3
+    CHAIN_FIELD = None
+    SAFE_GENERATE = True
+
+    class Meta:
+        abstract = True
+
+    def _get_base_id(self, chain_field):
+        chain_prefix_length = len(chain_field.prefix + self.SEPARATOR)
+        if is_verbose_id(chain_field.prefix, chain_field.SEPARATOR, chain_field.id):
+            return chain_field.id[chain_prefix_length:]
+        elif self.SAFE_GENERATE:
+            raise InvalidVerboseIdException(chain_field.id)
+        else:
+            return chain_field.generate_id_with_check()[chain_prefix_length:]
+
+    def _rgetattr(self, attr):
+
+        def _getattr(obj, attr):
+            try:
+                return getattr(obj, attr)
+            except DoesNotExist:
+                return None
+
+        return functools.reduce(_getattr, attr, self)
+
+    def _validate_chain_field(self):
+        if self.CHAIN_FIELD is None:
+            raise MissedChainFieldException(self.__class__)
+
+        chain_field_value = self._rgetattr(self.CHAIN_FIELD.split('__'))
+
+        if chain_field_value is None:
+            raise NullFieldValueException(self.CHAIN_FIELD)
+
+        return chain_field_value

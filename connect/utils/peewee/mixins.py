@@ -1,6 +1,6 @@
 import peewee
 
-from connect.utils.peewee.models import VerboseBase
+from connect.utils.peewee.models import TransactionalIDBase, VerboseBase
 from connect.utils.peewee.utils import generate_verbose_id
 
 
@@ -147,3 +147,62 @@ class OrderedModelMixin(peewee.Model):
 
         filtered_resource.execute()
         self.save()
+
+
+class TransactionalIDMixin(TransactionalIDBase):
+    """
+    Mixin for chaining (grouping) related instances with VerboseID. Chain of instances have the
+    same ID base, but a different postfix (f.e. PRE-000-1, PRE-000-2).
+
+    IMPORTANT: This mixin can not be used for bulk_create operations.
+
+    Examples:
+        class Asset(VerboseIDMixin):
+          pass
+
+        class Request(TransactionalObjectIDMixin):
+          SUFFIX_LENGTH = 3
+          CHAIN_FIELD = 'asset'
+
+          asset = models.ForeignKey(Asset)
+
+
+          @property
+          def prefix(self):
+            return 'R'
+
+        asset = Asset.objects.create()
+        r0 = Request.objects.create(asset=asset)  # ID = R-123-001
+        r1 = Request.objects.create(asset=asset)  # ID = R-123-002
+
+    Notes:
+        1) Chaining starts from 1. Old IDs with chain_id=-1 do not have -000 postfix.
+        2) If we do not set CHAIN_FIELD for a given model, then it will throw error
+    """
+    NO_VALUE = -1
+    chain_id = peewee.IntegerField(default=NO_VALUE)
+
+    class Meta:
+        abstract = True
+
+    @property
+    def prefix(self):
+        raise NotImplementedError()
+
+    def _generate_id(self, iteration=0):
+        chain_field = self._validate_chain_field()
+        base_id = self._get_base_id(chain_field)
+
+        if iteration > 0:
+            self.chain_id += 1
+        else:
+            row = self.__class__.select(
+                peewee.fn.MAX(self.__class__.chain_id)).where(
+                self.CHAIN_FIELD == chain_field).scalar()
+
+            if not row or row.chain_id is None or row.chain_id == -1:
+                self.chain_id = 1
+            else:
+                self.chain_id = row.chain_id + 1
+        prefix = f'{self.prefix}{self.SEPARATOR}{base_id}{self.SEPARATOR}'
+        return f'{prefix}{self.chain_id:0{self.SUFFIX_LENGTH}}'
