@@ -38,12 +38,6 @@ markdown_extensions:
   - attr_list
   - toc:
       toc_depth: 3
-plugins:
-  - glightbox
-  - macros:
-      module_name: docs/macros
-  - search:
-      lang: en
 nav:
   - Home: index.md
   - Getting Started: getting_started.md
