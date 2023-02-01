@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "peewee-model-utils"
-version = "0.1.0"
+version = "1.0.0"
 description = ""
 authors = ["Rahul Mondal <rahul.mondal@ingrammicro.com>"]
 readme = "README.md"
