@@ -8,7 +8,7 @@
 from the [pypi.org](https://pypi.org/project/peewee-model-utils/) repository.
 
 ```
-$ pip install connect-openapi-client
+$ pip install peewee-model-utils
 ```
 
 ## Example use of VerboseIDMixin
